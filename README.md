@@ -1,3 +1,3 @@
 # Reproductive-Freedom-for-Michigan-Figures
 
-Reproductive Freedom for Michigan: Utilizing Survey Results to Explore Demographic Factors Influencing Voting Behavior, Legal Perspectives, and Self-Identification Relating to Abortion.
+Here we examine the demographics of Michigan's proposal 3 of 2022. 
