@@ -1,0 +1,719 @@
+---
+title: 'SOSS 85 Data'
+author: "Lola Browne"
+date: "2024-03-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### LOADING PACKAGES
+```{r}
+library(dplyr)
+```
+
+#### LOADING AND CREATING DATASET
+
+# Load Survey Data
+```{r}
+survey <- read.csv("SSOS 85 Excel.csv")
+```
+
+# Survey Collumns
+```{r}
+colnames(survey)
+```
+
+# Make into New Data Set
+```{r}
+prop3 <- survey[c(1, 30:33, 76:99, 52:60)]
+```
+
+#### ASSIGNING DUMMBY VARIABLES
+
+# vote5 = ballot
+Are you likely to vote for or against the ballot initiative?
+```{r}
+# Vote for the ballot initiative
+prop3$ballot[prop3$vote5 == "Support"] <- 1
+
+# Vote against/Don’t change anything
+prop3$ballot[prop3$vote5 == "Oppose"] <- 0
+
+# I don’t know
+prop3$ballot[prop3$vote5 == "I don‚Äôt know"] <- NA
+
+#Skipped
+prop3$ballot[prop3$vote5 == "skipped"] <- NA
+```
+
+# vote5a = ballot2
+If you absolutely had to decide today, would you be likely to vote for or against a ballot initiative establishing reproductive rights, including abortion rights? (if vote5 ne <8> goto vote5a)
+```{r}
+# Vote for the ballot initiative
+prop3$ballot2[prop3$vote5a == "Support"] <- 1
+
+# Vote against/Don’t change anything
+prop3$ballot2[prop3$vote5a == "Oppose"] <- 0
+
+# I don’t know
+prop3$ballot2[prop3$vote5a == "I don‚Äôt know"] <- NA
+
+# Skipped
+prop3$ballot2[prop3$vote5a == "skipped"] <- NA
+
+# Not Asked
+prop3$ballot2[prop3$vote5a == "not asked"] <- NA
+```
+
+# vote5b = legal1, legal2, legal3
+Do you think abortions should be legal under any circumstances, legal only under certain circumstances, or illegal in all circumstances?
+```{r}
+# legal under any circumstances
+prop3$legal1[prop3$vote5b == "Legal under any circumstances"] <- 1
+prop3$legal1[prop3$vote5b == "Legal only under certain circumstances"] <- 0
+prop3$legal1[prop3$vote5b == "Illegal in all circumstances"] <- 0
+
+# legal only under certain circumstances
+prop3$legal2[prop3$vote5b == "Legal only under certain circumstances"] <- 1
+prop3$legal2[prop3$vote5b == "Legal under any circumstances"] <- 0
+prop3$legal2[prop3$vote5b == "Illegal in all circumstances"] <- 0
+
+# illegal in all circumstances
+prop3$legal3[prop3$vote5b == "Illegal in all circumstances"] <- 1
+prop3$legal3[prop3$vote5b == "Legal under any circumstances"] <- 0
+prop3$legal3[prop3$vote5b == "Legal only under certain circumstances"] <- 0
+```
+
+# vote5c = abor_iden1 & abor_iden2
+With respect to the abortion issue, would you consider yourself to be pro-choice or pro-life?
+```{r}
+# Pro-choice
+prop3$abor_iden1[prop3$vote5c == "Pro-choice"] <- 1
+prop3$abor_iden1[prop3$vote5c == "Pro-life"] <- 0
+
+# Pro-life
+prop3$abor_iden2[prop3$vote5c == "Pro-life"] <- 1
+prop3$abor_iden2[prop3$vote5c == "Pro-choice"] <- 0
+
+# I don’t know
+prop3$abor_iden[prop3$vote5c == "I don‚Äôt know"] <- NA
+```
+
+# CD1 = sex
+What is your sex?
+```{r}
+# Male
+prop3$sex[prop3$CD1 == "Male"] <- 1
+
+# Female
+prop3$sex[prop3$CD1 == "Female"] <- 2
+```
+
+# CD2 = generation
+In what year were you born?
+```{r}
+# Silent Generation
+prop3$generation[prop3$CD2 >= 1928 & prop3$CD2 <= 1945] <- "Silent Generation"
+
+# Baby Boomer
+prop3$generation[prop3$CD2 >= 1946 & prop3$CD2 <= 1964] <- "Baby Boomer"
+
+# Gen X
+prop3$generation[prop3$CD2 >= 1965 & prop3$CD2 <= 1980] <- "Gen X"
+
+# Millennial
+prop3$generation[prop3$CD2 >= 1981 & prop3$CD2 <= 1996] <- "Millennial"
+
+# Gen Z
+prop3$generation[prop3$CD2 >= 1997 & prop3$CD2 <= 2012] <- "Gen Z"
+```
+
+# CD3 = edu
+What is the highest level of education you have completed?
+```{r}
+# Did not go to school
+prop3$edu[prop3$CD3 == "Did not go to school"] <- 0
+
+# Did not graduate high school
+prop3$edu[prop3$CD3 == "Did not graduate high school"] <- 1
+
+# High school graduate or GED holder
+prop3$edu[prop3$CD3 == "High school graduate or GED holder"] <- 2
+
+# 1st year college
+prop3$edu[prop3$CD3 == "1st year college"] <- 3
+
+# 2nd year college
+prop3$edu[prop3$CD3 == "2nd year college"] <- 4
+
+# Technical/junior college graduate
+prop3$edu[prop3$CD3 == "Technical/junior college graduate"] <- 5
+
+# 3rd year college
+prop3$edu[prop3$CD3 == "3rd year college"] <- 6
+
+# College graduate (four years)
+prop3$edu[prop3$CD3 == "College graduate (four years)"] <- 7
+
+# Some post graduate
+prop3$edu[prop3$CD3 == "Some post graduate"] <- 8
+
+# Graduate degree
+prop3$edu[prop3$CD3 == "Graduate degree"] <- 9
+```
+
+# CD3 = edu_words
+What is the highest level of education you have completed?
+```{r}
+# No diploma/GED
+prop3$edu_words[prop3$CD3 == "Did not go to school"] <- "No diploma/GED"
+prop3$edu_words[prop3$CD3 == "Did not graduate high school"] <- "No diploma/GED"
+
+# Diploma/GED
+prop3$edu_words[prop3$CD3 == "High school graduate or GED holder"] <- "Diploma/GED"
+
+# 1st year college
+prop3$edu_words[prop3$CD3 == "1st year college"] <- "1st year college"
+
+# 2nd year college
+prop3$edu_words[prop3$CD3 == "2nd year college"] <- "2nd year college"
+
+# Technical/junior college graduate
+prop3$edu_words[prop3$CD3 == "Technical/junior college graduate"] <- "Technical/junior college graduate"
+
+# 3rd year college
+prop3$edu_words[prop3$CD3 == "3rd year college"] <- "3rd year college"
+
+# College degree
+prop3$edu_words[prop3$CD3 == "College graduate (four years)"] <- "College degree"
+
+# Some post graduate
+prop3$edu_words[prop3$CD3 == "Some post graduate"] <- "Some post graduate"
+
+# Graduate degree
+prop3$edu_words[prop3$CD3 == "Graduate degree"] <- "Graduate degree"
+```
+
+# CD5a = hispan
+Are you of Hispanic, Latinx, or Spanish origin?
+```{r}
+# No, not of Hispanic/Latinx/Spanish origin
+prop3$hispan[prop3$CD5a == "No, not of Hispanic/Latinx/Spanish origin"] <- 0
+
+# Yes, Hispanic/Latinx/Spanish origin
+prop3$hispan[prop3$CD5a == "Yes, Hispanic/Latinx/Spanish origin"] <- 1
+```
+
+# CD4_1 = white
+What is your race (White or Caucasian)?
+```{r}
+# No, not White
+prop3$white[prop3$CD4_1 == "not selected"] <- 0
+
+# Yes, White
+prop3$white[prop3$CD4_1 == "selected"] <- 1
+```
+
+# CD4_2 = afr_amer
+What is your race (African American or Black)?
+```{r}
+# No, not African American or Black
+prop3$afr_amer[prop3$CD4_2 == "not selected"] <- 0
+
+# Yes, African American or Black
+prop3$afr_amer[prop3$CD4_2 == "selected"] <- 1
+```
+
+# CD4_3 = pac_isla
+What is your race (Hawaiian or other Pacific Islander)?
+```{r}
+# No, not Hawaiian or other Pacific Islander
+prop3$pac_isla[prop3$CD4_3 == "not selected"] <- 0
+
+# Yes, Hawaiian or other Pacific Islander
+prop3$pac_isla[prop3$CD4_3 == "selected"] <- 1
+```
+
+# CD4_4 = asian
+What is your race (Asian)?
+```{r}
+# No, not Asian
+prop3$asian[prop3$CD4_4 == "not selected"] <- 0
+
+# Yes, Asian
+prop3$asian[prop3$CD4_4 == "selected"] <- 1
+```
+
+# CD4_5 = native
+What is your race (American Indian or Alaska Native)?
+```{r}
+# No, not American Indian or Alaska Native
+prop3$native[prop3$CD4_5 == "not selected"] <- 0
+
+# Yes, American Indian or Alaska Native
+prop3$native[prop3$CD4_5 == "selected"] <- 1
+```
+
+# CD4_6 = race_oth
+What is your race (Other)?
+```{r}
+# No, not Other
+prop3$race_oth[prop3$CD4_6 == "not selected"] <- 0
+
+# Yes, Other
+prop3$race_oth[prop3$CD4_6 == "selected"] <- 1
+```
+
+# CD6 = religion
+What is the religious group which you feel most closely represents your religious views?
+```{r}
+# None; no religious group (Atheist, Agnostic, etc.)
+prop3$religion[prop3$CD6 == "None; no religious group (Atheist, Agnostic, etc.)"] <- 0
+
+# Catholic; Roman Catholic, Orthodox
+prop3$religion[prop3$CD6 == "Catholic; Roman Catholic, Orthodox"] <- 1
+
+# Islamic/Muslim
+prop3$religion[prop3$CD6 == "Islamic/Muslim"] <- 2
+
+# Jewish
+prop3$religion[prop3$CD6 == "Jewish"] <- 3
+
+# Protestant (Baptist, Methodist, Lutheran, Episcopalian, etc.)
+prop3$religion[prop3$CD6 == "Protestant (Baptist, Methodist, Lutheran, Episcopalian, etc.)"] <- 4
+
+# Other
+prop3$religion[prop3$CD6 == "Other"] <- 5
+
+# skipped
+prop3$religion[prop3$CD6 == "skipped"] <- NA
+```
+
+# CD6_t = religion2
+What is the religious group which you feel most closely represents your religious views (specify)?
+```{r}
+# None; no religious group (Atheist, Agnostic, etc.)
+prop3$religion2[prop3$CD6_t == "agnostic" | 
+                       prop3$CD6_t == "Believe in God" |
+                       prop3$CD6_t == "faith" |
+                       prop3$CD6_t == "Gnostic" |
+                       prop3$CD6_t == "I believe in God" |
+                       prop3$CD6_t == "I do believe in God but really not to a certain religion" |
+                       prop3$CD6_t == "in GOD" |
+                       prop3$CD6_t == "Just believe in God not religions" |
+                       prop3$CD6_t == "Just beloe8ive in God" |
+                       prop3$CD6_t == "My own beliefs." |
+                       prop3$CD6_t == "none" |
+                       prop3$CD6_t == "Not Religious" |
+                       prop3$CD6_t == "Nothing in particular"] <- 0
+
+# Catholic; Roman Catholic, Orthodox
+prop3$religion2[prop3$CD6_t == "Catholic"] <- 1
+
+# Jewish
+prop3$religion2[prop3$CD6_t == "Hebrew/Bible beliver" |
+                       prop3$CD6_t == "Messianic Jew" |
+                       prop3$CD6_t == "Yahshuan"] <- 2
+
+# Protestant (Baptist, Methodist, Lutheran, Episcopalian, etc.)
+prop3$religion2[prop3$CD6_t == "7th Day Adventist" |
+                       prop3$CD6_t == "American Baptist" |
+                       prop3$CD6_t == "baptist" |
+                       prop3$CD6_t == "Baptist" |
+                       prop3$CD6_t == "A follower of Jesus's teachings" |
+                       prop3$CD6_t == "Apostolic" |
+                       prop3$CD6_t == "Born again christiann" |
+                       prop3$CD6_t == "Chrismatic" |
+                       prop3$CD6_t == "Christain" |
+                       prop3$CD6_t == "christian" |
+                       prop3$CD6_t == "Christian" |
+                       prop3$CD6_t == "Christian faith" |
+                       prop3$CD6_t == "Christian no denomination" |
+                       prop3$CD6_t == "Christian Non-Denomination" |
+                       prop3$CD6_t == "Christian without denomination" |
+                       prop3$CD6_t == "Christian, no church affiliation" |
+                       prop3$CD6_t == "Christianity" |
+                       prop3$CD6_t == "Church of Christ" |
+                       prop3$CD6_t == "Church of Jesus Christ of Latter-Day Saints" |
+                       prop3$CD6_t == "Jehovah witness" |
+                       prop3$CD6_t == "Jehovah‚Äôs Witnesses" |
+                       prop3$CD6_t == "lutheran" |
+                       prop3$CD6_t == "Lutheran" |
+                       prop3$CD6_t == "Mormon" |
+                       prop3$CD6_t == "Non denominational" |
+                       prop3$CD6_t == "Non denominational christian" |
+                       prop3$CD6_t == "Non denominational Christian" |
+                       prop3$CD6_t == "Non domation" |
+                       prop3$CD6_t == "non domimiational" |
+                       prop3$CD6_t == "Non-Denomination" |
+                       prop3$CD6_t == "non-denominational" |
+                       prop3$CD6_t == "Non-denominational" |
+                       prop3$CD6_t == "Nondenominational" |
+                       prop3$CD6_t == "Pentecost" |
+                       prop3$CD6_t == "Pentecostal" |
+                       prop3$CD6_t == "Presbyterian" |
+                       prop3$CD6_t == "Quaker" |
+                       prop3$CD6_t == "Reformed Christian" |
+                       prop3$CD6_t == "unaffiliated Christian" |
+                       prop3$CD6_t == "Unitarian" |
+                       prop3$CD6_t == "Unitarian Universalist" |
+                       prop3$CD6_t == "Unitarian Universalist and Wicca"] <- 3
+
+# Other
+prop3$religion2[prop3$CD6_t == "Buddhism" |
+                       prop3$CD6_t == "buddhist"] <- 4
+prop3$religion2[prop3$CD6_t == "Hindu"] <- 4
+prop3$religion2[prop3$CD6_t == "new age" |
+                       prop3$CD6_t == "Spiritual" |
+                       prop3$CD6_t == "Spiritual not religious" |
+                       prop3$CD6_t == "Spiritual, not religious." |
+                       prop3$CD6_t == "Spiritualist. The major religions are all about control."] <- 4
+prop3$religion2[prop3$CD6_t == "Pagan" |
+                       prop3$CD6_t == "Pagan/wiccan" |
+                       prop3$CD6_t == "pagen"|
+                       prop3$CD6_t == "Wiccan"] <-4
+prop3$religion2[prop3$CD6_t == "Setian" |
+                       prop3$CD6_t == "The Satanic Temple"] <- 4
+prop3$religion2[prop3$CD6_t == "Natural life"] <- 4
+prop3$religion2[prop3$CD6_t == "Native American people"] <- 4
+prop3$religion2[prop3$CD6_t == "I believe many fit my beliefs"] <- 4
+prop3$religion2[prop3$CD6_t == "Jedi"] <- 4
+prop3$religion2[prop3$CD6_t == "__NA__"] <- 4
+prop3$religion2[prop3$CD6_t == "NYFB"] <- 4
+prop3$religion2[prop3$CD6_t == "Perfect not to answer to avoid discrimination"] <- 4
+prop3$religion2[prop3$CD6_t == " "] <- 4
+```
+
+# CD7 = party
+Generally speaking, do you think of yourself as a Republican, a Democrat, an Independent or something else?
+```{r}
+# Republican
+prop3$party[prop3$CD7 == "Republican"] <- 1
+
+# Democrat
+prop3$party[prop3$CD7 == "Democrat"] <- 2
+
+# Independent
+prop3$party[prop3$CD7 == "Independent"] <- 3
+
+# Another party, third party, etc
+prop3$party[prop3$CD7 == "Another party, third party, etc"] <- 4
+
+# skipped
+prop3$party[prop3$CD7 == "skipped"] <- NA
+```
+
+# partyid = lean
+Would you call yourself a strong Republican or not a very strong Republican? Would you call yourself a strong Democrat or not a very strong Democrat? Do you generally think of yourself as closer to the Democratic Party or the Republican Party?
+```{r}
+# Neither
+prop3$lean[prop3$partyid == "Neither"] <- 0
+
+# Strong Republican
+prop3$lean[prop3$partyid == "Strong Republican"] <- 1
+
+# Lean Republican
+prop3$lean[prop3$partyid == "Lean Republican"] <- 2 
+
+# Not a very strong Republican
+prop3$lean[prop3$partyid == "Not a very strong Republican"] <- 3
+
+# Strong Democrat
+prop3$lean[prop3$partyid == "Strong Democrat"] <- 4
+
+# Lean Democrat
+prop3$lean[prop3$partyid == "Lean Democrat"] <- 5
+
+# Not a very strong Democrat
+prop3$lean[prop3$partyid == "Not a very strong Democrat"] <- 6
+
+# skipped
+prop3$lean[prop3$partyid == "skipped"] <- NA
+
+# not asked
+prop3$lean[prop3$partyid == "not asked"] <- NA
+```
+
+# partyid
+Would you call yourself a strong Republican or not a very strong Republican? Would you call yourself a strong Democrat or not a very strong Democrat? Do you generally think of yourself as closer to the Democratic Party or the Republican Party?
+```{r}
+# Neither
+prop3$partyid[prop3$partyid == "skipped"] <- "Neither"
+prop3$partyid[prop3$partyid == "not asked"] <- "Neither"
+```
+
+# ideology = ideo_spec
+Generally speaking, do you think of yourself as a conservative, a moderate, or a liberal?
+```{r}
+# Very conservative
+prop3$ideo_spec[prop3$ideology == "Very conservative"] <- 1
+
+# Somewhat conservative
+prop3$ideo_spec[prop3$ideology == "Somewhat conservative"] <- 2
+
+# Closer to the conservative side
+prop3$ideo_spec[prop3$ideology == "Closer to the conservative side"] <- 3
+
+# In the middle
+prop3$ideo_spec[prop3$ideology == "In the middle"] <- 4
+
+# Closer to the liberal side
+prop3$ideo_spec[prop3$ideology == "Closer to the liberal side"] <- 5
+
+# Somewhat liberal
+prop3$ideo_spec[prop3$ideology == "Somewhat liberal"] <- 6
+
+# Very liberal
+prop3$ideo_spec[prop3$ideology == "Very liberal"] <- 7
+
+# Don't know
+prop3$ideo_spec[prop3$ideology == "Don't know"] <- NA
+
+# skipped
+prop3$ideo_spec[prop3$ideology == "skipped"] <- NA
+```
+
+## COMBINE VARIABLES
+# vote5 + vote5a = ballot_combine, ballot_combine1, ballot_combine2
+```{r}
+prop3$ballot_combine[prop3$vote5 == "Support"] <- "Support"
+prop3$ballot_combine[prop3$vote5a == "Support"] <- "Support"
+prop3$ballot_combine[prop3$vote5 == "Oppose"] <- "Oppose"
+prop3$ballot_combine[prop3$vote5a == "Oppose"] <- "Oppose"
+
+# Support
+
+prop3$ballot_combine1[prop3$ballot_combine == "Support"] <- 1
+prop3$ballot_combine1[prop3$ballot_combine == "Oppose"] <- 0
+
+# Oppose
+
+prop3$ballot_combine2[prop3$ballot_combine == "Oppose"] <- 1
+prop3$ballot_combine2[prop3$ballot_combine == "Support"] <- 0
+```
+
+# CD5a + CD4_1 + CD4_2 + CD4_3 + CD4_4 + CD4_5 + CD4_6 = race_combine
+```{r}
+# White
+prop3$race_combine[prop3$CD4_1 == "selected"] <- "White"
+
+# African American
+prop3$race_combine[prop3$CD4_2 == "selected"] <- "African American"
+
+# Pacific Islander
+prop3$race_combine[prop3$CD4_3 == "selected"] <- "Pacific Islander"
+
+# Hispanic
+prop3$race_combine[prop3$CD5a == "Yes, Hispanic/Latinx/Spanish origin"] <- "Hispanic"
+
+# Other Race
+prop3$race_combine[prop3$CD4_6 == "selected"] <- "Other Race"
+prop3$race_combine[prop3$CD4_4 == "selected"] <- "Other Race"
+prop3$race_combine[prop3$CD4_5 == "selected"] <- "Other Race"
+```
+
+# CD6 + religion2 = religion_combine
+```{r}
+# Other
+prop3$religion_combine[prop3$religion2 == 4] <- "Other"
+prop3$religion_combine[prop3$CD6 == "Islamic/Muslim"] <- "Other"
+prop3$religion_combine[prop3$CD6 == "Jewish"] <- "Other"
+prop3$religion_combine[prop3$religion2 == 2] <- "Other"
+prop3$religion_combine[prop3$CD6_t == "__NA__"] <- "Other"
+
+# None
+prop3$religion_combine[prop3$CD6 == "None; no religious group (Atheist, Agnostic, etc.)"] <- "None"
+prop3$religion_combine[prop3$religion2 == 0] <- "None"
+
+# Catholic
+prop3$religion_combine[prop3$CD6 == "Catholic; Roman Catholic, Orthodox"] <- "Catholic"
+prop3$religion_combine[prop3$religion2 == 1] <- "Catholic"
+
+# Protestant
+prop3$religion_combine[prop3$CD6 == "Protestant (Baptist, Methodist, Lutheran, Episcopalian, etc.)"] <- "Protestant"
+prop3$religion_combine[prop3$religion2 == 3] <- "Protestant"
+```
+
+#### VARIABLE TOTALS
+
+# vote5
+```{r}
+# Are you likely to vote for or against the ballot initiative?
+table(prop3$vote5)
+```
+
+# vote5a
+```{r}
+# If you absolutely had to decide today, would you be likely to vote for or against a ballot initiative establishing reproductive rights, including abortion rights? (if vote5 ne <8> goto vote5a)
+table(prop3$vote5a)
+```
+
+# ballot_combine
+```{r}
+# vote5 + vote5a
+table(prop3$ballot_combine)
+```
+
+# vote5b
+```{r}
+# Do you think abortions should be legal under any circumstances, legal only under certain circumstances, or illegal in all circumstances?
+table(prop3$vote5b)
+```
+
+# vote5c
+```{r}
+# With respect to the abortion issue, would you consider yourself to be pro-choice or pro-life?
+table(prop3$vote5c)
+```
+
+# CD1
+```{r}
+# What is your sex?
+table(prop3$CD1)
+```
+
+# CD2
+```{r}
+# In what year were you born?
+table(prop3$CD2)
+```
+
+# generation
+```{r}
+# CD2 generations
+table(prop3$generation)
+```
+
+# CD3
+```{r}
+# What is the highest level of education you have completed?
+table(prop3$CD3)
+```
+
+# CD5a
+```{r}
+# Are you of Hispanic, Latinx, or Spanish origin?
+table(prop3$CD5a)
+```
+
+# CD4_1
+```{r}
+# What is your race (White or Caucasian)?
+table(prop3$CD4_1)
+```
+
+# CD4_2
+```{r}
+# What is your race (African American or Black)?
+table(prop3$CD4_2)
+```
+
+# CD4_3
+```{r}
+# What is your race (Hawaiian or other Pacific Islander)?
+table(prop3$CD4_3)
+```
+
+# CD4_4
+```{r}
+# What is your race (Asian)?
+table(prop3$CD4_4)
+```
+
+# CD4_5
+```{r}
+# What is your race (American Indian or Alaska Native)?
+table(prop3$CD4_5)
+```
+
+# CD4_6
+```{r}
+# What is your race (Other)?
+table(prop3$CD4_6)
+```
+
+# race_combine
+```{r}
+# All races
+table(prop3$race_combine)
+```
+
+# CD6
+```{r}
+# What is the religious group which you feel most closely represents your religious views?
+table(prop3$CD6)
+```
+
+# CD6_t
+```{r}
+# What is the religious group which you feel most closely represents your religious views (specify)?
+table(prop3$CD6_t)
+```
+
+# religion_combine
+```{r}
+# What is the religious group which you feel most closely represents your religious views (specify)?
+table(prop3$religion_combine)
+```
+
+# CD7
+```{r}
+# Generally speaking, do you think of yourself as a Republican, a Democrat, an Independent or something else?
+table(prop3$CD7)
+```
+
+# partyid
+```{r}
+# Would you call yourself a strong Republican or not a very strong Republican? Would you call yourself a strong Democrat or not a very strong Democrat? Do you generally think of yourself as closer to the Democratic Party or the Republican Party?
+table(prop3$partyid)
+```
+
+# ideology
+```{r}
+# Generally speaking, do you think of yourself as a conservative, a moderate, or a liberal?
+table(prop3$ideology)
+```
+
+#### ARRANGING FINAL DATA SET
+
+```{r}
+colnames(prop3)
+```
+
+```{r}
+prop3 <- prop3 %>%
+  select(caseid,
+         vote5, ballot,
+         vote5a, ballot2,
+         ballot_combine, ballot_combine1, ballot_combine2,
+         vote5b, legal1, legal2, legal3,
+         vote5c, abor_iden1, abor_iden2,
+         CD1, sex,
+         CD2, generation,
+         CD3,edu, edu_words,
+         CD5a, hispan,
+         CD4_1, white,
+         CD4_2, afr_amer,
+         CD4_3, pac_isla,
+         CD4_4, asian,
+         CD4_5, native,
+         CD4_6, race_oth,
+         race_combine,
+         CD6, religion,
+         CD6_t, religion2,
+         religion_combine,
+         CD7, party,
+         partyid, lean,
+         ideology, ideo_spec) %>%
+  arrange(caseid)
+
+head(prop3)
+```
+
+#### Save Final Data
+```{r}
+saveRDS(prop3, file = "prop3.rds")
+```
